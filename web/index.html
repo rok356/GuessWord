@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Game Status</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var ws = new WebSocket("ws://localhost:5678/");
+            ws.onopen = function() {
+                console.log("WebSocket connection established.");
+            };
+            ws.onmessage = function(event) {
+                var data = JSON.parse(event.data);
+                var statusTable = document.getElementById("status-table");
+                // Clear previous table rows
+                statusTable.innerHTML = "<tr><th>Client Address</th><th>Start Time</th><th>Attempts Left</th><th>Game Won</th><th>Game Over</th></tr>";
+                data.details.forEach(function(client) {
+                    for (var address in client) {
+                        var clientInfo = client[address];
+                        var row = statusTable.insertRow();
+                        row.insertCell().textContent = address;
+                        row.insertCell().textContent = clientInfo.start_time;
+                        row.insertCell().textContent = clientInfo.game_state.attempts_left;
+                        row.insertCell().textContent = clientInfo.game_state.game_won ? "Yes" : "No";
+                        row.insertCell().textContent = clientInfo.game_state.game_over ? "Yes" : "No";
+                    }
+                });
+            };
+        });
+    </script>
+</head>
+<body>
+    <h1>Game Status</h1>
+    <table id="status-table">
+        <tr>
+            <th>Client Address</th>
+            <th>Start Time</th>
+            <th>Attempts Left</th>
+            <th>Game Won</th>
+            <th>Game Over</th>
+        </tr>
+    </table>
+</body>
+</html>
